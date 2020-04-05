@@ -12,7 +12,7 @@
 >代码
 ```java
 public String replaceSpace(StringBuffer str) {
-    int n  = 0;
+    int n  = 0;//指定开始搜索的索引
     while(str.indexOf(" ",n)!=-1){
         int index = str.indexOf(" ",n);
         str.deleteCharAt(index);
