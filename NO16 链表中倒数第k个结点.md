@@ -1,17 +1,12 @@
-# <center> NO16 链表中倒数第k个结点
+ # <center> NO16 链表中倒数第k个结点
 > 题目要求
 
     输入一个链表，输出该链表中倒数第k个结点
 
 > 分析
 
-    定义两个指针。
-
-        1. 第一个指针从链表头指针开始遍历向前走k-1，第二个指针保持不动
-
-        2. 从第k步开始，第二个指针也开始从链表的头指针开始遍历。
-
-        3. 由于两个指针的距离保持在k-1，当第一个指针到达链表尾节点时，第二个指针正好是倒数第k个节点。
+    定义两个指针：
+    通过初始化两个移动节点的位置距离为k，然后同时移动两个节点，知道第二个节点移动到链表的末尾时，移动节点1的位置就是链表倒数第k个节点。
 <center><img src = "img/06.png"></center>
 
 > 代码
@@ -30,24 +25,21 @@
 */
 public class Solution {
     public ListNode FindKthToTail(ListNode head,int k) {
-        if(head == null || k==0)
-            return null;
-        ListNode temp =head;
-        for(int i = 0 ; i< k-1; i++){
-            if(temp.next!=null)
-                temp = temp.next;
-            else
-                return null;
-        }
-        ListNode pA = head;
-        ListNode pB = head;
-        for(int i=0;i<k-1;i++)
-            pA = pA.next;
-        while(pA.next!=null){
-            pA = pA.next;
-            pB = pB.next;
-        }
-        return pB;
+            ListNode removeNode = head;
+            while (k != 0) {
+                if (removeNode == null) { 
+                    /// k 大于链表的长度，直接返回null
+                    return null;
+                }
+                removeNode = removeNode.next;
+                k--;
+            }
+            while (removeNode != null) { 
+                 /// 这个循环其实就是同时移动head和removeNode两个节点。
+                removeNode = removeNode.next;
+                head = head.next;
+            }
+            return head;
     }
 }
 ```
