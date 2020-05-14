@@ -4,67 +4,45 @@
 
     输入n个整数，找出其中最小的K个数。例如输入4,5,1,6,2,7,3,8这8个数字，则最小的4个数字是1,2,3,4,。
 
+## 分析
+
+    使用最大堆，保存目前已知的最小的k个数，堆顶是k个数中最大的元素。遍历数组，若堆中元素个数小于k，则直接添加到当前数字到堆中；若当前数字小于堆顶元素（即堆中最大元素），说明堆顶元素不可能是最小的k个数之一，因此用当前数字替换掉堆顶元素，然后保持堆有序（即最大元素在堆顶）；若当前数字大于堆顶元素，说明当前数字不可能是最小的k个数之一，跳过该数字。
+
+    Java最大堆API：可使用优先队列来实现最大堆。需要设置比较器为逆序：
+    使用最大堆（或最小堆）查找最小（或最大）的k个数，比较适合处理海量数据。因为内存的限制，通常不能一次全部载入所有输入数据到内存中。因此，可以每次只读取一部分数据，使用堆来维持目前已知的状态。
+
 ## 代码
 ```java
 
-public ArrayList<Integer> GetLeastNumbers_Solution(int [] input, int k) {
-        if (k  > input.length || k == 0) {
-            return new ArrayList<>();
-        }
-
-        int[] a = new int[k]; // 用数组去模拟k个节点的堆结构
-        System.arraycopy(input, 0, a, 0, k); // 初始化堆中元素
-        // 下面就开始维护堆使其成为大顶堆 - > 堆的初始化
-        for (int i = k / 2 - 1; i >= 0; i--) {
-            // i -> i其实就是我们所要去维护堆的节点下标
-            initiate(i, a, k);
-        }
-        // 去遍历剩余的len - k个节点
-        for (int i = k; i < input.length; i++) {
-            if (input[i] < a[0]) {
-                a[0] = input[i];
-                initiate(0, a, k);
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.PriorityQueue;
+import java.util.Queue;
+public class Solution {
+    public ArrayList<Integer> GetLeastNumbers_Solution(int [] input, int k) {
+        if (input == null) return new ArrayList<>();
+        int length = input.length;
+        if (length == 0 || k <= 0 || k > length) return new ArrayList<>();
+        //最大堆
+        Queue<Integer> maxHeap = new PriorityQueue<>(Comparator.reverseOrder());
+        for (int currentValue : input)
+        {
+            if (maxHeap.size() < k)
+            {
+                maxHeap.add(currentValue);
+            } else
+            {
+                //当前值比最大堆中的最大值小，则用当前值替换最大值
+                if (currentValue < maxHeap.peek())
+                {
+                    maxHeap.poll();  //移除最大值
+                    maxHeap.add(currentValue);  //添加当前值
+                }
             }
         }
-        // 将大顶堆中的节点元素进行升序操作
-        for (int i = a.length - 1; i > 0; i--) {
-            // 分为两个过程， 第一步交换，第二步固定(固定的操作其实是通过控制堆的节点个数去实现的)
-            int temp = a[i];
-            a[i] = a[0];
-            a[0] = temp;
-            initiate(0, a, i);
-        }
-        // 返回
-        ArrayList<Integer> ans = new ArrayList<>();
-        for (int x : a) {
-            ans.add(x);
-        }
-        return ans;
+        return new ArrayList<>(maxHeap);
     }
-
-    /**
-     * 初始化堆的函数,其实就是维护每一个节点的位置的函数
-     * @param index 维护当前堆的下标
-     * @param a 数组->堆
-     * @param length 堆的节点个数
-     */
-    private void initiate(int index, int[] a, int length) {
-        int temp = a[index]; // 先去保存当前位置的值
-        for (int k = index * 2 + 1; k < length; k = k * 2 + 1) {
-            if ((k + 1) < length && a[k + 1] > a[k]) {
-                // 取出当前位置的左右孩子中节点值最大的节点
-                k++;
-            }
-            if (a[k] > temp) {
-                a[index] = a[k];
-                index = k; // 更新index的值，index -> 代表的是temp数字最终在堆中位置，当k = k * 2 + 1执行后,index和k的关系其实就是父亲节点和孩子节点的关系。
-            } else {
-                break; // 由于我们是从下往上去维护的，所以说我们就没有往下更新的必要了
-            }
-        }
-        a[index] = temp; // index所在的位置进行更新就行了
-
-    }
+}
 
 ```
 ## 快排代码
@@ -136,4 +114,24 @@ class Quick{
 		a[j] = temp;
 	}
 }
+```
+## 普通方法调用Arrays sort
+
+```java
+import java.util.*;
+
+public class Solution {
+    public ArrayList<Integer> GetLeastNumbers_Solution(int[] input, int k) {
+        ArrayList<Integer> al = new ArrayList<>();
+        if(input.length <= 0 || input == null || k <= 0 || k > input.length){
+            return al;
+        }
+        Arrays.sort(input);
+        for(int i = 0; i < k; i++){
+            al.add(input[i]);
+        }
+        return al;
+    }
+}
+
 ```
